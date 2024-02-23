@@ -15,11 +15,11 @@ const db = mysql.createConnection({
 })
 
 app.get("/", (req, res) => {
-    const startDate = dayjs(req.query.startDate).format('YYYY-MM-DD HH:mm:ss');
-    const endDate = dayjs(req.query.endDate).format('YYYY-MM-DD HH:mm:ss');
+    const startDate = dayjs(req.query.startDate).format('YYYY-MM-DD HH:mm:ss')
+    const endDate = dayjs(req.query.endDate).format('YYYY-MM-DD HH:mm:ss')
 
     if (!startDate || !endDate) {
-        return res.json({ Error: "Invalid date format" });
+        return res.json({ Error: "Invalid date format" })
     }
 
     const sql = `
@@ -32,20 +32,19 @@ app.get("/", (req, res) => {
             OR (PickUpDate <= ? AND DropOffDate >= ?)
             OR (PickUpDate >= ? AND DropOffDate <= ?)
         );
-    `;
+    `
 
-    // Flatten the array when passing values to db.query
     db.query(sql, [endDate, startDate, endDate, startDate, endDate, startDate], (err, data) => {
         if (err) {
-            console.log(sql);
-            console.error('SQL Error:', err);
+            // console.log(sql);
+            // console.error('SQL Error:', err);
             return res.json({ Error: "Error" });
         } else {
-            console.log(sql);
+            // console.log(sql);
             return res.json(data);
         }
-    });
-});
+    })
+})
 
 
 
@@ -80,9 +79,7 @@ app.get("/", (req, res) => {
 
 
 app.post("/create", (req, res) => {
-    // const sql = "INSERT INTO kraine.Cars (Brand, Model, Seats, Transmission, OneHourPrice, TwoHoursPrice, FiveHoursPrice, OneDayPrice, Image) VALUES (?)";
-    const sql = "INSERT INTO kraine.Cars (Brand, Model, Seats, Transmission, OneHourPrice, TwoHoursPrice, FiveHoursPrice, OneDayPrice, Image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+    const sql = "INSERT INTO kraine.Cars (Brand, Model, Seats, Transmission, OneHourPrice, TwoHoursPrice, FiveHoursPrice, OneDayPrice, Image) VALUES (?)";
     const values = [
         req.body.Brand,
         req.body.Model,
@@ -95,15 +92,12 @@ app.post("/create", (req, res) => {
         req.body.Image
     ]
 
-    console.log('SQL Query:', sql);
-
-
     db.query(sql, [values], (err, data) => {
         if (err) {
             console.error("Error creating car:", err);
-            return res.status(500).json({ error: "Internal Server Error" });
+            return res.status(500).json({ error: "Internal Server Error" })
         }
-        return res.json(data);
+        return res.json(data)
     })
 
 })
@@ -156,7 +150,7 @@ app.get('/getrecord/:ID', (req, res) => {
     })
 })
 
-app.post("/reservation/:ID", (req, res) => {
+app.put("/reservation/:ID", (req, res) => {
     const sql = "INSERT INTO kraine.Reservation (ID_Car, PickUpDate, DropOffDate, Price) VALUES (?)";
     
     const values = [

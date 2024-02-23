@@ -1,5 +1,6 @@
 import { Button, Form, Input, InputNumber, Select, Typography } from 'antd';
 const { Title } = Typography;
+
 const onFinish = (values) => {
   console.log('Success:', values);
 };
@@ -18,7 +19,7 @@ export default function CarForm({ formName, handleForSubmit, values, setValues }
         wrapperCol={{span: 16,}}
         style={{maxWidth: 600,}}
         initialValues={{ remember: true,}}
-        onFinish={onFinish}
+        onFinish={handleForSubmit}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
       >

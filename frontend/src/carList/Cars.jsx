@@ -7,65 +7,38 @@ import Img from './components/carsInfo/image'
 import FurtherInfo from './components/carsInfo/furtherInfo'
 import Price from './components/carsInfo/price'
 import Buttons from './components/carsInfo/links'
-
-
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-
-dayjs.extend(customParseFormat)
+import DatesPicker from './components/datesPicker'
 
 const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate }) => {
 
   const [cars, setCars] = useState([])
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
- useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3030?startDate=${startDate}&endDate=${endDate}`)
+  useEffect(() => {
+    if (isSubmitted) {
+      const fetchData = async () => {
+        try {
+          const response = await axios.get(`http://localhost:3030?startDate=${startDate}&endDate=${endDate}`)
 
-        if (response.data && response.data.Error) {
-          // console.error(response.data.Error)
-          setCars([])
-        } else if (Array.isArray(response.data)) {
-          setCars(response.data)
-        } else {
-          console.error('Invalid server response. Expected an array.')
+          if (response.data && response.data.Error) {
+            console.error(response.data.Error)
+            setCars([])
+          } else if (Array.isArray(response.data)) {
+            setCars(response.data)
+          } else {
+            console.error('Invalid server response. Expected an array.')
+            setCars([])
+          }
+        } catch (error) {
+          console.error('Error fetching cars. Please try again.', error)
           setCars([])
         }
-      } catch (error) {
-        console.error('Error fetching cars. Please try again.', error)
-        setCars([])
       }
+
+      fetchData()
     }
-
-    fetchData()
-  }, [startDate, endDate])
-
-
-
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get('http://localhost:3030');
-
-  //       if (response.data && response.data.Error) {
-  //         console.error(response.data.Error);
-  //         setCars([]);
-  //       } else if (Array.isArray(response.data)) {
-  //         setCars(response.data);
-  //       } else {
-  //         console.error('Invalid server response. Expected an array.')
-  //         setCars([]);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching cars. Please try again.', error)
-  //       setCars([])
-  //     }
-  //   }
-
-  //   fetchData()
-  // }, [])
+  }, [startDate, endDate, isSubmitted])
 
   const handleDelete = (ID) => {
     axios.delete(`http://localhost:3030/delete/${ID}`)
@@ -76,34 +49,83 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate }) => {
         console.log(err)
       })
   }
+  
+  const handleSubmit = (e) => {
 
-  const currentDate = new Date()
+    e.preventDefault()
+
+    const now = new Date()
+    const startDateObject = new Date(startDate)
+    const endDateObject = new Date(endDate)
+
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }
+
+    const formattedDateTime = now.toLocaleString(undefined, options)
+    const start = startDateObject.toLocaleString(undefined, options)
+    const end = endDateObject.toLocaleString(undefined, options)
+
+    const nowPlusOneHour = new Date(now.getTime() + 60 * 60 * 1000).toLocaleString(undefined, options)
+
+    if (start > end) {
+      setErrorMessage('Start date must be before or equal to end date.')
+      setCars([])
+      return
+    } else if (start<formattedDateTime || end<formattedDateTime) {
+      setErrorMessage('You cant choose the past')
+      setCars([])
+      return
+    } else if (start < nowPlusOneHour) {
+      setErrorMessage('Start date must be at least 1 hour after the current date and time.')
+      setCars([])
+      return
+    } else if ((endDateObject - startDateObject)< 60 * 60 * 1000) {
+      setErrorMessage('The duration must be at least 1 hour.')
+      setCars([])
+      return
+    }
+
+    setIsSubmitted(true)
+    setErrorMessage('')
+  }
 
   return (
     <>
       <Link to="/create" className='btn btn-success'>Create Car</Link>
 
-      <div>
-        <label htmlFor="startDate">Start Date: </label>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', margin: '2rem', justifyContent: 'center', alignItems: 'center' }}
+      >
+
+        <label htmlFor="startDate" style={{ fontSize: '1.2rem' }}>Start Date: </label>
         <input
           type="datetime-local"
           id="startDate"
           value={startDate}
-          min={currentDate.toISOString().slice(0, -8)}
+          style={{ height: '3rem', width: '15rem', fontSize: '1.2rem', padding: '1rem', margin: '1rem' }}
           onChange={(e) => onChangeStartDate(e.target.value)}
+          required
         />
-      </div>
-      <div>
-        <label htmlFor="endDate">End Date: </label>
+
+        <label htmlFor="endDate" style={{ fontSize: '1.2rem' }}>End Date: </label>
         <input
           type="datetime-local"
           id="endDate"
           value={endDate}
-          // min={startDate}
+          style={{ height: '3rem', width: '15rem', fontSize: '1.2rem', padding: '1rem', margin: '1rem'}}
           onChange={(e) => onChangeEndDate(e.target.value)}
-          // onChange={(e) => onChangeEndDate(e.target.value < startDate ? startDate : e.target.value)}
         />
-      </div>
+
+        <button type='submit' style={{ width: '5rem', height: '2rem' }}>Submit</button>
+      </form>
+
+      {errorMessage && <p style={{ color: 'red', fontSize:'1.5rem', display:'flex', justifyContent:'center' }}>{errorMessage}</p>}
 
       {cars.map((car) => (
         <section className="car" key={car.ID} style={{ margin: '3rem 0 0 0' }}>
