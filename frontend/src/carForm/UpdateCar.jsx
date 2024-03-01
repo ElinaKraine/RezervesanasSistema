@@ -2,7 +2,7 @@ import axios from 'axios'
 import {useEffect, useState} from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-const UpdateCar = () => {
+const UpdateCar = ({ Current_user }) => {
 
     const { ID } = useParams ()
     
@@ -49,6 +49,7 @@ const UpdateCar = () => {
     }, [])
 
     return (
+        Current_user === "admin" ?
         <div className="d-flex align-items-center flex-column mt-3">
             <h2>Update Car</h2>
             <form className="w-50" onSubmit={handleSubmit}>
@@ -179,7 +180,8 @@ const UpdateCar = () => {
                 </div>
                 <button type="submit" className="btn btn-primary">Submit</button>
             </form>
-        </div>
+            </div>
+            : <div>You are not autharized</div>
     )
 }
 

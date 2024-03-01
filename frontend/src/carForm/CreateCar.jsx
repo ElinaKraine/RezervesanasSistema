@@ -3,7 +3,7 @@ import {useState} from 'react'
 import { useNavigate } from 'react-router-dom'
 import CarForm from './components/carForm'
 
-const CreateCar = () => {
+const CreateCar = ({ Current_user }) => {
 
     const [values, setValues] = useState({
         Brand: "",
@@ -160,12 +160,15 @@ const CreateCar = () => {
         //         <button type="submit" className="btn btn-primary">Submit</button>
         //     </form>
         // </div>
-        <CarForm
-            formName={"Add a car"}
-            handleForSubmit={handleSubmit}
-            values={values}
-            setValues={setValues}
-        />
+        Current_user === "admin" ?
+            <CarForm
+                formName={"Add a car"}
+                handleForSubmit={handleSubmit}
+                values={values}
+                setValues={setValues}
+            />
+            :
+            <div>You are not autharized</div>
     )
 }
 

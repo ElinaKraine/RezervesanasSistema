@@ -2,43 +2,94 @@ import { useEffect, useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+
 import Name from './components/carsInfo/name'
 import Img from './components/carsInfo/image'
 import FurtherInfo from './components/carsInfo/furtherInfo'
 import Price from './components/carsInfo/price'
 import Buttons from './components/carsInfo/links'
-import DatesPicker from './components/datesPicker'
+import './components/carsInfo/carsInfo.css'
+import DatesPicker from './components/datesPicker/datesPicker'
+import Filter from './components/filter/Filter'
 
-const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate }) => {
+const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_user }) => {
 
   const [cars, setCars] = useState([])
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
+  const [selectedBrand, setSelectedBrand] = useState([])
+  const [selectedSort, setSelectedSort] = useState(null)
+  const [selectedTransmission, setSelectedTransmission] = useState([])
+  // const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     if (isSubmitted) {
       const fetchData = async () => {
         try {
-          const response = await axios.get(`http://localhost:3030?startDate=${startDate}&endDate=${endDate}`)
+          const encodedBrands = selectedBrand.map(brand => encodeURIComponent(brand)).join('&brand[]=');
+          const encodedTransmissions = selectedTransmission.map(transmission => encodeURIComponent(transmission)).join('&transmission[]=');
+          
+          let apiUrl = `http://localhost:3030?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+          
+          if (selectedBrand && selectedBrand.length > 0) {
+            apiUrl += `&brand[]=${encodedBrands}`
+          }
+
+          if (selectedSort) {
+            apiUrl += `&sort=${selectedSort}`
+          }
+
+          if (selectedTransmission && selectedTransmission.length > 0) {
+            apiUrl += `&transmission[]=${encodedTransmissions}`
+          }
+
+          const response = await axios.get(apiUrl)
+          console.log(apiUrl)
 
           if (response.data && response.data.Error) {
-            console.error(response.data.Error)
-            setCars([])
+            console.error(response.data.Error);
+            setCars([]);
           } else if (Array.isArray(response.data)) {
-            setCars(response.data)
+            setCars(response.data);
           } else {
-            console.error('Invalid server response. Expected an array.')
-            setCars([])
+            console.error('Invalid server response. Expected an array.');
+            setCars([]);
           }
         } catch (error) {
-          console.error('Error fetching cars. Please try again.', error)
-          setCars([])
+          console.error('Error fetching cars. Please try again.', error);
+          setCars([]);
         }
-      }
+      };
 
-      fetchData()
+      fetchData();
+      setIsSubmitted(false);
     }
-  }, [startDate, endDate, isSubmitted])
+  }, [startDate, endDate, selectedBrand, selectedSort, isSubmitted]);
+
+  // useEffect(() => {
+  //   if (isSubmitted) {
+  //     const fetchData = async () => {
+  //       try {
+  //         const response = await axios.get(`http://localhost:3030?startDate=${startDate}&endDate=${endDate}`)
+
+  //         if (response.data && response.data.Error) {
+  //           console.error(response.data.Error)
+  //           setCars([])
+  //         } else if (Array.isArray(response.data)) {
+  //           setCars(response.data)
+  //         } else {
+  //           console.error('Invalid server response. Expected an array.')
+  //           setCars([])
+  //         }
+  //       } catch (error) {
+  //         console.error('Error fetching cars. Please try again.', error)
+  //         setCars([])
+  //       }
+  //     }
+
+  //     fetchData()
+  //     setIsSubmitted(false)
+  //   }
+  // }, [startDate, endDate, isSubmitted])
 
   const handleDelete = (ID) => {
     axios.delete(`http://localhost:3030/delete/${ID}`)
@@ -49,124 +100,189 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate }) => {
         console.log(err)
       })
   }
-  
-  const handleSubmit = (e) => {
 
-    e.preventDefault()
+  // const cena = (oneH, twoH, fiveH, oneD) => {
+  //   const startDateObject = new Date(startDate)
+  //   const endDateObject = new Date(endDate)
+  //   const totalTime = (endDateObject - startDateObject) / (1000*60*60)
+  //   if (totalTime == 1) {
+  //     galigaCena=oneH
+  //   } else if (totalTime > 1 && totalTime <= 2) {
+  //     galigaCena=twoH
+  //   } else if (totalTime>2 && totalTime<=5) {
+  //     galigaCena=fiveH
+  //   } else if (totalTime > 5 && totalTime <= 24) {
+  //     galigaCena=oneD
+  //   } else if (totalTime>24) {
+  //     galigaCena=oneD*2
+  //   }
+  //   onChangePrice(galigaCena)
+  //   return (galigaCena)
+  // }
 
-    const now = new Date()
-    const startDateObject = new Date(startDate)
-    const endDateObject = new Date(endDate)
+  // const handleChangePrice = (price) => {
+  //   setTotalPrice(price);
+  // };
+//   const handleChangePrice = (carIndex, price) => {
+//   onChangePrice((prevGaligaCena) => {
+//     // Ensure the array has the correct length
+//     const newGaligaCena = [...prevGaligaCena];
+//     while (newGaligaCena.length <= carIndex) {
+//       newGaligaCena.push(0);  // You might want to initialize with a default value
+//     }
 
-    const options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    }
+//     // Update the specific index
+//     newGaligaCena[carIndex] = price;
 
-    const formattedDateTime = now.toLocaleString(undefined, options)
-    const start = startDateObject.toLocaleString(undefined, options)
-    const end = endDateObject.toLocaleString(undefined, options)
+//     return newGaligaCena;
+//   });
+  // };
 
-    const nowPlusOneHour = new Date(now.getTime() + 60 * 60 * 1000).toLocaleString(undefined, options)
+//   const hasDuplicates = (currentCar) => {
+//   let seenCars = new Set();
 
-    if (start > end) {
-      setErrorMessage('Start date must be before or equal to end date.')
-      setCars([])
-      return
-    } else if (start<formattedDateTime || end<formattedDateTime) {
-      setErrorMessage('You cant choose the past')
-      setCars([])
-      return
-    } else if (start < nowPlusOneHour) {
-      setErrorMessage('Start date must be at least 1 hour after the current date and time.')
-      setCars([])
-      return
-    } else if ((endDateObject - startDateObject)< 60 * 60 * 1000) {
-      setErrorMessage('The duration must be at least 1 hour.')
-      setCars([])
-      return
-    }
+//   for (const car of cars) {
+//     if (car === currentCar) {
+//       continue; // Skip the current car when comparing with itself
+//     }
 
-    setIsSubmitted(true)
-    setErrorMessage('')
-  }
+//     const key = `${car.Brand}-${car.Model}-${car.Seats}-${car.Transmission}-${car.OneHourPrice}-${car.TwoHoursPrice}-${car.FiveHoursPrice}-${car.OneDayPrice}`;
+
+//     if (seenCars.has(key)) {
+//       return true; // Duplicate found
+//     }
+
+//     seenCars.add(key);
+//   }
+
+//   return false; // No duplicates found
+// };
+
+
+  // const getUnique = (cars) => {
+  //   const uniqueCars = cars.filter((car, index, array) => {
+  //     // Check if there is no previous car with the same properties (excluding ID)
+  //     return index === array.findIndex((otherCar) => {
+  //       // Compare all properties except ID
+  //       return (
+  //         car.Brand === otherCar.Brand &&
+  //         car.Model === otherCar.Model &&
+  //         car.Seats === otherCar.Seats &&
+  //         car.Transmission === otherCar.Transmission &&
+  //         car.OneHourPrice === otherCar.OneHourPrice &&
+  //         car.TwoHoursPrice === otherCar.TwoHoursPrice &&
+  //         car.FiveHoursPrice === otherCar.FiveHoursPrice &&
+  //         car.OneDayPrice === otherCar.OneDayPrice
+  //       );
+  //     });
+  //   });
+
+  //   console.log(uniqueCars);
+  // }
+
+  const getUnique = (cars) => {
+  const uniqueCars = cars.filter((car, index, array) => {
+    // Check if there is no previous car with the same properties (excluding ID)
+    return index === array.findIndex((otherCar) => {
+      // Compare all properties except ID
+      return (
+        car.Brand === otherCar.Brand &&
+        car.Model === otherCar.Model &&
+        car.Seats === otherCar.Seats &&
+        car.Transmission === otherCar.Transmission &&
+        car.OneHourPrice === otherCar.OneHourPrice &&
+        car.TwoHoursPrice === otherCar.TwoHoursPrice &&
+        car.FiveHoursPrice === otherCar.FiveHoursPrice &&
+        car.OneDayPrice === otherCar.OneDayPrice
+      );
+    });
+  });
+
+  // Determine if each car is the last unique one
+  const lastUniqueCars = uniqueCars.map((uniqueCar, index) => {
+    return index === uniqueCars.length - 1;
+  });
+
+  return { uniqueCars, lastUniqueCars };
+};
+
+
 
   return (
     <>
-      <Link to="/create" className='btn btn-success'>Create Car</Link>
+      {Current_user === "admin" ? 
+        <Link to="/create" className='btn btn-success'>Create Car</Link>
+       : 
+        <></>
+      }
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: 'flex', margin: '2rem', justifyContent: 'center', alignItems: 'center' }}
-      >
+      <DatesPicker
+        startDate={startDate}
+        endDate={endDate}
+        onChangeStartDate={onChangeStartDate}
+        onChangeEndDate={onChangeEndDate}
+        setCars={setCars}
+        setIsSubmitted={setIsSubmitted}
+      />
 
-        <label htmlFor="startDate" style={{ fontSize: '1.2rem' }}>Start Date: </label>
-        <input
-          type="datetime-local"
-          id="startDate"
-          value={startDate}
-          style={{ height: '3rem', width: '15rem', fontSize: '1.2rem', padding: '1rem', margin: '1rem' }}
-          onChange={(e) => onChangeStartDate(e.target.value)}
-          required
+      {Filter && (
+        <Filter
+          setSelectedBrand={setSelectedBrand}
+          setSelectedSort={setSelectedSort}
+          setSelectedTransmission={setSelectedTransmission}
         />
+      )}
 
-        <label htmlFor="endDate" style={{ fontSize: '1.2rem' }}>End Date: </label>
-        <input
-          type="datetime-local"
-          id="endDate"
-          value={endDate}
-          style={{ height: '3rem', width: '15rem', fontSize: '1.2rem', padding: '1rem', margin: '1rem'}}
-          onChange={(e) => onChangeEndDate(e.target.value)}
-        />
-
-        <button type='submit' style={{ width: '5rem', height: '2rem' }}>Submit</button>
-      </form>
-
-      {errorMessage && <p style={{ color: 'red', fontSize:'1.5rem', display:'flex', justifyContent:'center' }}>{errorMessage}</p>}
-
-      {cars.map((car) => (
-        <section className="car" key={car.ID} style={{ margin: '3rem 0 0 0' }}>
-          <div className="img">
-            <Img
-              image={car.Image}
+      {cars.map((car, index) => (
+          <section className="car" key={car.ID} style={{ margin: '3rem 0 0 0' }}>
+            <div className="img">
+              <Img
+                image={car.Image}
+              />
+            </div>
+            <div className="info">
+              <Name
+                brand={car.Brand}
+                model={car.Model}
             />
-          </div>
-          <div className="info">
-            <Name
-              brand={car.Brand}
-              model={car.Model}
+            <p>{getUnique(cars).lastUniqueCars[index] ? 'not last' : 'last'}</p>
+              <FurtherInfo
+                seats={car.Seats}
+                transmission={car.Transmission}
+                lastCar={getUnique(cars).lastUniqueCars[index]}
+                // lastCar={hasDuplicates(car)}
             />
-            <FurtherInfo
-              seats={car.Seats}
-              transmission={car.Transmission}
-            />
-          </div>
-          <div className="price">
-            <Price
-              onehourprice={car.OneHourPrice}
-              twohoursprice={car.TwoHoursPrice}
-              fivehoursprice={car.FiveHoursPrice}
-              onedayprice={car.OneDayPrice}
-            />
-          </div>
-          <div className="buttons">
-            <Buttons
-              site={`/update/${car.ID}`}
-              title={"Update"}
-            />
-            <button type='button' onClick={() => handleDelete(car.ID)} className='btn btn-danger btn-sm m-2 fs-5'>Delete</button>
-            <Buttons
-              site={`/reservation/${car.ID}`}
-              title={"Reservation"}
-            />
-          </div>
-        </section>
-      ))}
-    </>
-  )
-}
+            </div>
+            <div className="price">
+              <Price
+                onehourprice={car.OneHourPrice}
+                twohoursprice={car.TwoHoursPrice}
+                fivehoursprice={car.FiveHoursPrice}
+                onedayprice={car.OneDayPrice}
+              />
+            </div>
+            <div className="buttons">
+              {Current_user === "admin" ? 
+                <>
+                  <Buttons
+                    site={`/update/${car.ID}`}
+                    title={"Update"}
+                  />
+                  <button type='button' onClick={() => handleDelete(car.ID)} className='btn btn-danger btn-sm m-2 fs-5'>Delete</button>
+                </>
+              : 
+                <></>
+              }
+              <Buttons
+                site={`/reservation/${car.ID}`}
+                title={"Reservation"}
+              />
+            </div>
+          </section>
+        ))
+      }
+     </>
+   )
+ }
 
 export default Cars

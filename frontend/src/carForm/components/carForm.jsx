@@ -57,7 +57,7 @@ export default function CarForm({ formName, handleForSubmit, values, setValues }
           />
         </Form.Item>
 
-        {/* <Form.Item
+        <Form.Item
           label="Seats:"
           rules={[{
             required: true,
@@ -70,8 +70,8 @@ export default function CarForm({ formName, handleForSubmit, values, setValues }
             name="seats"
             onChange={(value) => setValues({ ...values, Seats: value })}
           />
-        </Form.Item> */}
-        <Form.Item
+        </Form.Item>
+        {/* <Form.Item
           label="s:"
           name="s"
           rules={[
@@ -86,7 +86,7 @@ export default function CarForm({ formName, handleForSubmit, values, setValues }
             name="s"
             onChange={(e) => setValues({...values, Seats: e.target.value})}
           />
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item
           label="Select:"

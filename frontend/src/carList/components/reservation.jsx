@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button } from 'antd'
+import { Button, message } from 'antd'
+import dayjs from 'dayjs'
 
 const Reservation = ({startDate, endDate}) => {
 
@@ -39,59 +40,85 @@ const Reservation = ({startDate, endDate}) => {
       .catch((err) => console.log(err))
   }, [ID])
 
+  const formattedStartDate = dayjs(startDate).format('YYYY-MM-DD HH:mm:ss')
+  const formattedEndDate = dayjs(endDate).format('YYYY-MM-DD HH:mm:ss')
 
   const [values, setValues] = useState({
     ID_Car: ID,
-    PickUpDate: startDate,
-    DropOffDate: endDate,
+    PickUpDate: formattedStartDate,
+    DropOffDate: formattedEndDate,
     Price: 0
   })
+
+  const showError = (errorMsg) => {
+    message.error({
+      content: errorMsg,
+      duration: 5,
+      style: {
+          fontSize: '1.5rem'
+      },
+    })
+  }
+
+  const showSuccess = (successMsg) => {
+    message.success({
+      content: successMsg,
+      duration: 5,
+      style: {
+          fontSize: '1.5rem'
+      },
+    })
+  }
 
   const navigate = useNavigate()
 
   const calculatePrice = () => {
 
     let totalPrice = 0
-    const oneHourPrice = parseFloat(valuesCar.OneHourPrice);
-    const twoHoursPrice = parseFloat(valuesCar.TwoHoursPrice);
-    const fiveHoursPrice = parseFloat(valuesCar.FiveHoursPrice);
-    const oneDayPrice = parseFloat(valuesCar.OneDayPrice);
+    const oneHourPrice = parseFloat(valuesCar.OneHourPrice)
+    const twoHoursPrice = parseFloat(valuesCar.TwoHoursPrice)
+    const fiveHoursPrice = parseFloat(valuesCar.FiveHoursPrice)
+    const oneDayPrice = parseFloat(valuesCar.OneDayPrice)
 
-    const startDateObject = new Date(startDate)
-    const endDateObject = new Date(endDate)
+    if (!isNaN(oneHourPrice) && !isNaN(twoHoursPrice) && !isNaN(fiveHoursPrice) && !isNaN(oneDayPrice)) {
+      const startDateObject = new Date(startDate)
+      const endDateObject = new Date(endDate)
+      const totalTime = (endDateObject - startDateObject) / (1000*60*60)
 
-    const totalTime = (endDateObject - startDateObject) / (1000 * 60 * 60)
-    console.log(totalTime)
-    console.log(oneDayPrice)
-
-    if (totalTime==1) {
-      totalPrice = oneHourPrice
-    } else if (totalTime > 1 && totalTime <= 2) {
-      totalPrice = twoHoursPrice
-    } else if (totalTime > 2 && totalTime <= 5) {
-      totalPrice = fiveHoursPrice
-    } else if (totalTime > 5 && totalTime <= 24) {
-      totalPrice = oneDayPrice
-    } else if (totalTime > 24) {
-      totalPrice= oneDayPrice*2
+      if (totalTime === 1) {
+        totalPrice = oneHourPrice
+      } else if (totalTime > 1 && totalTime <= 2) {
+        totalPrice = twoHoursPrice
+      } else if (totalTime > 2 && totalTime <= 5) {
+        totalPrice = fiveHoursPrice
+      } else if (totalTime > 5 && totalTime <= 24) {
+        totalPrice = oneDayPrice
+      } else if (totalTime > 24) {
+        totalPrice = oneDayPrice * 2
+      }
     }
-
-    console.log("Total Price:", totalPrice);
-
     setValues({ ...values, Price: totalPrice.toFixed(2) })
   }
 
-
   useEffect(() => {
-    calculatePrice()
-  }, [])
+    if (valuesCar.Brand) {
+      calculatePrice()
+    }
+  }, [valuesCar, startDate, endDate])
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     axios
       .put(`http://localhost:3030/reservation/${ID}`, values)
-      .then(res => navigate('/'))
-      .catch(err => console.log(err))
+      .then(res => {
+        showSuccess('Reservation is successful!')
+        navigate('/')
+        console.log(res)
+      })
+      .catch((err) => {
+        console.log(err)
+        showError("Reservation is not successful!")
+       })
   }
 
   return (
@@ -113,11 +140,11 @@ const Reservation = ({startDate, endDate}) => {
         </div>
       </section>
       <br />
-      <h2>{startDate}</h2>
-      <h2>{endDate}</h2>
+      <h2>{dayjs(startDate).format('YYYY-MM-DD HH:mm')}</h2>
+      <h2>{dayjs(endDate).format('YYYY-MM-DD HH:mm')}</h2>
       <div className="mb-3">
         <p>
-          <strong>Price:</strong> ${values.Price}
+          <strong>Price:</strong> {values.Price}
         </p>
       </div>
       <Button

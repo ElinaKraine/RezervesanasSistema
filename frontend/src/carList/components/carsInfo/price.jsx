@@ -1,14 +1,13 @@
-import { Typography } from 'antd';
-const { Title } = Typography;
+import { Typography } from 'antd'
+const { Title } = Typography
 
 export default function Price({ onehourprice, twohoursprice, fivehoursprice, onedayprice }) {
-
-    return (
-        <span>
-            <Title level={4}>1h: {onehourprice} EUR</Title>
-            <Title level={4}>2h: {twohoursprice} EUR</Title>
-            <Title level={4}>5h: {fivehoursprice} EUR</Title>
-            <Title level={4}>24h: {onedayprice} EUR</Title>
-        </span>
-    )
+  return (
+    <span>
+          <Title level={4}>{onehourprice} EUR</Title>
+          <Title level={4}>{twohoursprice} EUR</Title>
+          <Title level={4}>{fivehoursprice} EUR</Title>
+          <Title level={4}>{onedayprice} EUR</Title>
+    </span>
+  )
 }
