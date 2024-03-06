@@ -3,8 +3,15 @@ import CarImage from './car.png'
 import { Layout } from 'antd'
 const { Header } = Layout
 import './nav.css'
+import successMsg from '../message/successMsg'
 
-const Nav = ({Current_user}) => {
+const Nav = ({ Current_user, setCurrentUser }) => {
+
+    const handleLogout = () => {
+        successMsg({msg: 'You are successfully logout!'})
+        setCurrentUser('public')
+    }
+    
     return (
         <Header className='header'>
             <div style={{ display: 'flex' }}>
@@ -14,7 +21,7 @@ const Nav = ({Current_user}) => {
                 <h1>Car Rental Reservation System</h1>
             </div>
             {Current_user === 'admin' ?
-                <></>
+                <Link to='/' onClick={handleLogout} className='btn btn-outline-light btn-lg'>Logout</Link>
                 :
                 <>
                     <Link to="/login" className='btn btn-outline-light btn-lg'>Login</Link>

@@ -1,0 +1,29 @@
+.mainPage{
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    margin: auto;
+    flex-wrap: wrap;
+}
+
+.carList{
+    width: 75%;
+}
+
+.filter{
+    width: 25%;
+}
+
+.reservationButton{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.car {
+    display: flex;
+    justify-content: space-around;
+    border: 1px solid #c9c9c9;
+    border-radius: .5rem;
+    padding: 2rem 1rem;
+    margin: 0 0 3rem 0;
+}

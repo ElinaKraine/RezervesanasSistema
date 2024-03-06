@@ -1,4 +1,4 @@
-import './filter.css'
+import '../filter/filter.css'
 import { Select, Radio, Checkbox } from 'antd'
 import { useState } from 'react'
 
@@ -19,7 +19,7 @@ const Filter = ({ setSelectedBrand, setSelectedSort, setSelectedTransmission }) 
   const [brand, setBrand] = useState([])
   const filteredOptionsBrand = optionsBrand.filter((o) => !brand.includes(o))
 
-  const [sort, setSort] = useState('asc')
+  const [sort, setSort] = useState(null)
   const [transmission, setTransmission] = useState(null)
 
   const onChangeBrand = (value) => {
@@ -38,31 +38,32 @@ const Filter = ({ setSelectedBrand, setSelectedSort, setSelectedTransmission }) 
     setTransmission(value)
   }
 
-  
   return (
-    <div>
-      <h2>Filter:</h2>
-      <form>
-        <Select
-          mode="multiple"
-          className='f'
-          showSearch
-          placeholder="Select a Brand"
-          onChange={onChangeBrand}
-          value={brand}
-          options={filteredOptionsBrand.map((item) => ({
-            value: item,
-            label: item,
-          }))}
-        />
-        <br />
-        <Radio.Group onChange={onChangeSort} value={sort}>
-          <Radio value={'asc'}>Ascending</Radio>
-          <Radio value={'desc'}>Descending</Radio>
-        </Radio.Group>
-        <br />
-        <Checkbox.Group options={optionsTransmission} onChange={onChangeTransmission} value={transmission} />
-      </form>
+    <div className='carFilter'>
+      <Select
+        mode="multiple"
+        showSearch
+        placeholder="Select a Brand"
+        onChange={onChangeBrand}
+        value={brand}
+        options={filteredOptionsBrand.map((item) => ({
+          value: item,
+          label: item,
+        }))}
+      />
+      <Radio.Group onChange={onChangeSort} value={sort}>
+        <Radio value={'asc'}>
+          Ascending
+        </Radio>
+        <Radio value={'desc'}>
+          Descending
+        </Radio>
+      </Radio.Group>
+      <Checkbox.Group
+        options={optionsTransmission}
+        onChange={onChangeTransmission}
+        value={transmission}
+      />
     </div>
   )
 }

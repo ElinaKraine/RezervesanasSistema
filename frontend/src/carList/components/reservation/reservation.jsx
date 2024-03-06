@@ -1,8 +1,15 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, message } from 'antd'
+import { Steps } from 'antd'
 import dayjs from 'dayjs'
+
+import successMsg from '../../../components/message/successMsg'
+import errorMsg from '../../../components/message/errorMsg'
+import FurtherInfo from '../carsInfo/furtherInfo'
+import Name from '../carsInfo/name'
+import Img from '../carsInfo/image'
+import '../reservation/reservation.css'
 
 const Reservation = ({startDate, endDate}) => {
 
@@ -22,7 +29,7 @@ const Reservation = ({startDate, endDate}) => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3030/getrecord/${ID}`)
+      .get(`http://localhost:3030/getrecordCar/${ID}`)
       .then((res) => {
         setValuesCar({
           ...valuesCar,
@@ -50,27 +57,11 @@ const Reservation = ({startDate, endDate}) => {
     Price: 0
   })
 
-  const showError = (errorMsg) => {
-    message.error({
-      content: errorMsg,
-      duration: 5,
-      style: {
-          fontSize: '1.5rem'
-      },
-    })
-  }
-
-  const showSuccess = (successMsg) => {
-    message.success({
-      content: successMsg,
-      duration: 5,
-      style: {
-          fontSize: '1.5rem'
-      },
-    })
-  }
-
   const navigate = useNavigate()
+
+  const startDateObject = new Date(startDate)
+  const endDateObject = new Date(endDate)
+  const totalTime = (endDateObject - startDateObject) / (1000 * 60 * 60)
 
   const calculatePrice = () => {
 
@@ -81,11 +72,8 @@ const Reservation = ({startDate, endDate}) => {
     const oneDayPrice = parseFloat(valuesCar.OneDayPrice)
 
     if (!isNaN(oneHourPrice) && !isNaN(twoHoursPrice) && !isNaN(fiveHoursPrice) && !isNaN(oneDayPrice)) {
-      const startDateObject = new Date(startDate)
-      const endDateObject = new Date(endDate)
-      const totalTime = (endDateObject - startDateObject) / (1000*60*60)
 
-      if (totalTime === 1) {
+      if (totalTime == 1) {
         totalPrice = oneHourPrice
       } else if (totalTime > 1 && totalTime <= 2) {
         totalPrice = twoHoursPrice
@@ -94,7 +82,18 @@ const Reservation = ({startDate, endDate}) => {
       } else if (totalTime > 5 && totalTime <= 24) {
         totalPrice = oneDayPrice
       } else if (totalTime > 24) {
-        totalPrice = oneDayPrice * 2
+        const days = Math.floor(totalTime / 24)
+        const hours = totalTime % 24
+        totalPrice = oneDayPrice * days
+        if (hours % 5 == 0 && hours % 2 == 0 || hours % 5 == 0) {
+          const h5 = hours / 5
+          totalPrice += h5 * fiveHoursPrice
+        } else if(hours % 2 == 0) {
+          const h2 = hours / 2
+          totalPrice += h2 * 2
+        } else {
+          totalPrice += hours * oneHourPrice
+        }
       }
     }
     setValues({ ...values, Price: totalPrice.toFixed(2) })
@@ -111,47 +110,61 @@ const Reservation = ({startDate, endDate}) => {
     axios
       .put(`http://localhost:3030/reservation/${ID}`, values)
       .then(res => {
-        showSuccess('Reservation is successful!')
+        successMsg({ msg: 'Reservation is successful!' })
         navigate('/')
         console.log(res)
       })
       .catch((err) => {
         console.log(err)
-        showError("Reservation is not successful!")
+        errorMsg({ msg: 'Reservation is not successful!'})
        })
   }
 
+  const pickupdate = dayjs(startDate).format('YYYY-MM-DD HH:mm')
+  const dropoffdate = dayjs(endDate).format('YYYY-MM-DD HH:mm')
+
   return (
     <>
-      <section className="car">
-        <div className="img">
-          <img src={valuesCar.Image} alt={`${valuesCar.Brand} ${valuesCar.Model}`} />
-        </div>
-        <div className="info">
-          <h1>{`${valuesCar.Brand} ${valuesCar.Model}`}</h1>
-          <p>
-            <i className="material-icons">&#xe7fd;</i>
-            {valuesCar.Seats}
-          </p>
-          <p>
-            <i className="fa fa-car"></i>
-            {valuesCar.Transmission}
-          </p>
-        </div>
-      </section>
-      <br />
-      <h2>{dayjs(startDate).format('YYYY-MM-DD HH:mm')}</h2>
-      <h2>{dayjs(endDate).format('YYYY-MM-DD HH:mm')}</h2>
-      <div className="mb-3">
-        <p>
-          <strong>Price:</strong> {values.Price}
-        </p>
+      <div className='carAndTime'>
+        <section className="carReservation">
+          <div className="img">
+            <Img image={valuesCar.Image} />
+          </div>
+          <div className="infoReservation">
+            <Name
+              brand={valuesCar.Brand}
+              model={valuesCar.Model}
+            />
+            <FurtherInfo
+              seats={valuesCar.Seats}
+              transmission={valuesCar.Transmission}
+              isLastCar=''
+            />
+          </div>
+        </section>
+        <Steps
+          className='time'
+          direction="horizontal"
+          current={2}
+          items={[
+            {
+              title: 'Pick-up Date',
+              description: pickupdate,
+            },
+            {
+              title: 'Drop-off Date',
+              description: dropoffdate,
+            }
+          ]}
+        />
       </div>
-      <Button
-        type="primary"
-        htmlType="submit"
-        onClick={handleSubmit}
-      >Submit</Button>
+      <div className='row'>
+          <div className='totalPrice'>
+          <span className='totalTime'>Price for {totalTime} hours</span>
+            <span className='priceForTotalTime'>{values.Price} EUR</span>
+            <button className='btnReservation' type='submit' onClick={handleSubmit}>Book now</button>
+          </div>
+      </div>
     </>
   )
 }

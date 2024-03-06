@@ -1,4 +1,36 @@
-.f{
-    display: flex;
-    width: 10rem;
+/*Checkbox*/
+.ant-checkbox-wrapper{
+    font-size: 1.3rem;
+    margin: 0 0 1.2rem 1.8rem;
+}
+
+/*Radio*/
+:where(.css-dev-only-do-not-override-1rqnfsa).ant-checkbox, :where(.css-dev-only-do-not-override-1rqnfsa).ant-radio-wrapper .ant-radio-inner{
+    transform: scale(1.2)
+}
+:where(.css-dev-only-do-not-override-1drr2mu).ant-radio-group{
+    margin-bottom: 1rem;
+}
+:where(.css-dev-only-do-not-override-1drr2mu).ant-radio-wrapper {
+    font-size: 1.3rem;
+    margin-left: 1.8rem;
+}
+
+/**/
+:where(.css-dev-only-do-not-override-1drr2mu).ant-select-multiple .ant-select-selection-overflow{
+    font-size: 1.5rem;
+}
+
+:where(.css-dev-only-do-not-override-1drr2mu).ant-select-multiple{
+    font-size: 1.1rem;
+    width: 80%;
+    margin-left: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.carFilter{
+    border: 1px solid #c9c9c9;
+    border-radius: .5rem;
+    padding: 1rem;
+    background: #c9c9c9;
 }

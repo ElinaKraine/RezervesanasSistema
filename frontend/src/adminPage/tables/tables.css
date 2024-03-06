@@ -1,0 +1,54 @@
+.table{
+    width: 80%;
+    margin: auto;
+    padding-top: 2rem;
+}
+
+.ant-table table {
+    font-size: 1.5rem;
+}
+
+.btnCreate, .btnUpdate, .btnDelete{
+    text-decoration: none;
+    border: 1px solid darkgreen;
+    background: darkgreen;
+    color: white;
+    display: flex;
+    height: 2.5rem;
+    width: 12rem;
+    font-size: 1.5rem;
+    border-radius: .5rem;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.btnCreate:hover{
+    background: green;
+}
+
+.btnDelete, .btnUpdate{
+    width: 6rem;
+}
+
+.btnUpdate{
+    border-color: lightblue;
+    background: lightblue;
+    color: black;
+}
+
+.btnUpdate:hover{
+    background: rgb(106, 168, 219);
+    border-color: rgb(106, 168, 219);
+    color: rgb(54, 53, 53);
+}
+
+.btnDelete{
+    border-color: darkred;
+    background: darkred;
+}
+
+.btnDelete:hover{
+    border-color: lightcoral;
+    background: lightcoral;
+}

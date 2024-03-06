@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import './login.css'
+import successMsg from '../components/message/successMsg'
 
 export default function Login({ setCurrentUser }) {
 
@@ -13,12 +14,14 @@ export default function Login({ setCurrentUser }) {
     const navigate = useNavigate()
 
     function handleSubmit(event) {
-        event.preventDefault()
+        event.preventDefault();
         axios
             .post('http://localhost:3030/login', { name, password })
             .then(res => {
                 if (res.data === "Login Successfully") {
+                    successMsg({msg:'Login Successfully!'})
                     setCurrentUser("admin")
+                    localStorage.setItem('currentUser', 'admin')
                     navigate('/')
                 } else {
                     setInfoMessage('Login unsuccessful. Please check your username and password.')
@@ -32,7 +35,7 @@ export default function Login({ setCurrentUser }) {
 
     return (
         <div className="container">
-            <div className="row">
+            <div>
                 <div className="col-md-6">
                     <div className="card">
                         <form onSubmit={handleSubmit} className="box">

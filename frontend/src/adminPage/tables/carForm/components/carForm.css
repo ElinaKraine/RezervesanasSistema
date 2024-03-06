@@ -1,0 +1,42 @@
+.create{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 80%;
+    height: 100%;
+    margin: auto;
+}
+
+.title{
+    text-align: center;
+    padding: 2rem;
+}
+
+.carForm{
+    margin: auto;
+    width: 50rem;
+}
+
+:where(.css-dev-only-do-not-override-1drr2mu).ant-form-item .ant-form-item-label>label,
+:where(.css-dev-only-do-not-override-1drr2mu).ant-input-outlined,
+:where(.css-dev-only-do-not-override-1drr2mu).ant-input-number .ant-input-number-input,
+:where(.css-dev-only-do-not-override-1drr2mu).ant-select-single.ant-select-show-arrow .ant-select-selection-item{
+    font-size: 1.2rem;
+}
+
+:where(.css-dev-only-do-not-override-1drr2mu).ant-form-item .ant-form-item-explain-error{
+    font-size: 1rem;
+    padding-bottom: 1rem;
+}
+
+:where(.css-dev-only-do-not-override-1drr2mu).ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector{
+    height: 2.5rem;
+}
+
+.createbtn{
+    width: 7rem;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

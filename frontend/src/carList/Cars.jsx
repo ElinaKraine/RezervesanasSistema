@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Link } from 'react-router-dom'
 import axios from 'axios'
 
 import Name from './components/carsInfo/name'
@@ -8,9 +7,11 @@ import Img from './components/carsInfo/image'
 import FurtherInfo from './components/carsInfo/furtherInfo'
 import Price from './components/carsInfo/price'
 import Buttons from './components/carsInfo/links'
-import './components/carsInfo/carsInfo.css'
 import DatesPicker from './components/datesPicker/datesPicker'
 import Filter from './components/filter/Filter'
+import AdminPage from '../adminPage/adminPage'
+import './components/cars.css'
+import errorMsg from '../components/message/errorMsg'
 
 const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_user }) => {
 
@@ -19,16 +20,15 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
   const [selectedBrand, setSelectedBrand] = useState([])
   const [selectedSort, setSelectedSort] = useState(null)
   const [selectedTransmission, setSelectedTransmission] = useState([])
-  // const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     if (isSubmitted) {
       const fetchData = async () => {
         try {
-          const encodedBrands = selectedBrand.map(brand => encodeURIComponent(brand)).join('&brand[]=');
-          const encodedTransmissions = selectedTransmission.map(transmission => encodeURIComponent(transmission)).join('&transmission[]=');
+          const encodedBrands = selectedBrand.map(brand => encodeURIComponent(brand)).join('&brand[]=')
+          const encodedTransmissions = selectedTransmission.map(transmission => encodeURIComponent(transmission)).join('&transmission[]=')
           
-          let apiUrl = `http://localhost:3030?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+          let apiUrl = `http://localhost:3030?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`
           
           if (selectedBrand && selectedBrand.length > 0) {
             apiUrl += `&brand[]=${encodedBrands}`
@@ -43,246 +43,173 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
           }
 
           const response = await axios.get(apiUrl)
-          console.log(apiUrl)
 
           if (response.data && response.data.Error) {
-            console.error(response.data.Error);
-            setCars([]);
+            console.error(response.data.Error)
+            setCars([])
           } else if (Array.isArray(response.data)) {
-            setCars(response.data);
+            setCars(response.data)
           } else {
-            console.error('Invalid server response. Expected an array.');
-            setCars([]);
+            console.error('Invalid server response. Expected an array.')
+            setCars([])
           }
         } catch (error) {
-          console.error('Error fetching cars. Please try again.', error);
-          setCars([]);
+          console.error('Error fetching cars. Please try again.', error)
+          setCars([])
         }
-      };
+      }
 
-      fetchData();
-      setIsSubmitted(false);
+      fetchData()
+      setIsSubmitted(false)
     }
-  }, [startDate, endDate, selectedBrand, selectedSort, isSubmitted]);
+  }, [startDate, endDate, selectedBrand, selectedSort, isSubmitted])
 
-  // useEffect(() => {
-  //   if (isSubmitted) {
-  //     const fetchData = async () => {
-  //       try {
-  //         const response = await axios.get(`http://localhost:3030?startDate=${startDate}&endDate=${endDate}`)
-
-  //         if (response.data && response.data.Error) {
-  //           console.error(response.data.Error)
-  //           setCars([])
-  //         } else if (Array.isArray(response.data)) {
-  //           setCars(response.data)
-  //         } else {
-  //           console.error('Invalid server response. Expected an array.')
-  //           setCars([])
-  //         }
-  //       } catch (error) {
-  //         console.error('Error fetching cars. Please try again.', error)
-  //         setCars([])
-  //       }
-  //     }
-
-  //     fetchData()
-  //     setIsSubmitted(false)
-  //   }
-  // }, [startDate, endDate, isSubmitted])
-
-  const handleDelete = (ID) => {
-    axios.delete(`http://localhost:3030/delete/${ID}`)
-      .then(() => {
-        window.location.reload()
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+  const getUniqueAndNonUnique = (cars) => {
+    const uniqueKeys = new Set()
+    const uniqueCars = []
+    const nonUniqueCars = []
+  
+    cars.forEach((car) => {
+      const { ID, ...carWithoutID } = car
+      const carKey = `${carWithoutID.Brand}_${carWithoutID.Model}_${carWithoutID.Seats}_${carWithoutID.Transmission}_${carWithoutID.OneHourPrice}_${carWithoutID.TwoHoursPrice}_${carWithoutID.FiveHoursPrice}_${carWithoutID.OneDayPrice}`
+  
+      if (!uniqueKeys.has(carKey)) {
+        uniqueKeys.add(carKey)
+        uniqueCars.push(carWithoutID)
+      } else {
+        const indexInUnique = uniqueCars.findIndex((uniqueCar) => {
+          const uniqueCarKey = `${uniqueCar.Brand}_${uniqueCar.Model}_${uniqueCar.Seats}_${uniqueCar.Transmission}_${uniqueCar.OneHourPrice}_${uniqueCar.TwoHoursPrice}_${uniqueCar.FiveHoursPrice}_${uniqueCar.OneDayPrice}`
+          return uniqueCarKey === carKey;
+        })
+  
+        if (indexInUnique !== -1) {
+          uniqueCars.splice(indexInUnique, 1)
+        }
+        nonUniqueCars.push(carWithoutID)
+      }
+    })
+    return { uniqueCars, nonUniqueCars }
   }
-
-  // const cena = (oneH, twoH, fiveH, oneD) => {
-  //   const startDateObject = new Date(startDate)
-  //   const endDateObject = new Date(endDate)
-  //   const totalTime = (endDateObject - startDateObject) / (1000*60*60)
-  //   if (totalTime == 1) {
-  //     galigaCena=oneH
-  //   } else if (totalTime > 1 && totalTime <= 2) {
-  //     galigaCena=twoH
-  //   } else if (totalTime>2 && totalTime<=5) {
-  //     galigaCena=fiveH
-  //   } else if (totalTime > 5 && totalTime <= 24) {
-  //     galigaCena=oneD
-  //   } else if (totalTime>24) {
-  //     galigaCena=oneD*2
-  //   }
-  //   onChangePrice(galigaCena)
-  //   return (galigaCena)
-  // }
-
-  // const handleChangePrice = (price) => {
-  //   setTotalPrice(price);
-  // };
-//   const handleChangePrice = (carIndex, price) => {
-//   onChangePrice((prevGaligaCena) => {
-//     // Ensure the array has the correct length
-//     const newGaligaCena = [...prevGaligaCena];
-//     while (newGaligaCena.length <= carIndex) {
-//       newGaligaCena.push(0);  // You might want to initialize with a default value
-//     }
-
-//     // Update the specific index
-//     newGaligaCena[carIndex] = price;
-
-//     return newGaligaCena;
-//   });
-  // };
-
-//   const hasDuplicates = (currentCar) => {
-//   let seenCars = new Set();
-
-//   for (const car of cars) {
-//     if (car === currentCar) {
-//       continue; // Skip the current car when comparing with itself
-//     }
-
-//     const key = `${car.Brand}-${car.Model}-${car.Seats}-${car.Transmission}-${car.OneHourPrice}-${car.TwoHoursPrice}-${car.FiveHoursPrice}-${car.OneDayPrice}`;
-
-//     if (seenCars.has(key)) {
-//       return true; // Duplicate found
-//     }
-
-//     seenCars.add(key);
-//   }
-
-//   return false; // No duplicates found
-// };
-
-
-  // const getUnique = (cars) => {
-  //   const uniqueCars = cars.filter((car, index, array) => {
-  //     // Check if there is no previous car with the same properties (excluding ID)
-  //     return index === array.findIndex((otherCar) => {
-  //       // Compare all properties except ID
-  //       return (
-  //         car.Brand === otherCar.Brand &&
-  //         car.Model === otherCar.Model &&
-  //         car.Seats === otherCar.Seats &&
-  //         car.Transmission === otherCar.Transmission &&
-  //         car.OneHourPrice === otherCar.OneHourPrice &&
-  //         car.TwoHoursPrice === otherCar.TwoHoursPrice &&
-  //         car.FiveHoursPrice === otherCar.FiveHoursPrice &&
-  //         car.OneDayPrice === otherCar.OneDayPrice
-  //       );
-  //     });
-  //   });
-
-  //   console.log(uniqueCars);
-  // }
-
-  const getUnique = (cars) => {
-  const uniqueCars = cars.filter((car, index, array) => {
-    // Check if there is no previous car with the same properties (excluding ID)
-    return index === array.findIndex((otherCar) => {
-      // Compare all properties except ID
-      return (
-        car.Brand === otherCar.Brand &&
-        car.Model === otherCar.Model &&
-        car.Seats === otherCar.Seats &&
-        car.Transmission === otherCar.Transmission &&
-        car.OneHourPrice === otherCar.OneHourPrice &&
-        car.TwoHoursPrice === otherCar.TwoHoursPrice &&
-        car.FiveHoursPrice === otherCar.FiveHoursPrice &&
-        car.OneDayPrice === otherCar.OneDayPrice
-      );
-    });
-  });
-
-  // Determine if each car is the last unique one
-  const lastUniqueCars = uniqueCars.map((uniqueCar, index) => {
-    return index === uniqueCars.length - 1;
-  });
-
-  return { uniqueCars, lastUniqueCars };
-};
-
-
 
   return (
     <>
       {Current_user === "admin" ? 
-        <Link to="/create" className='btn btn-success'>Create Car</Link>
+        <AdminPage />
        : 
-        <></>
+        <>
+          <DatesPicker
+            startDate={startDate}
+            endDate={endDate}
+            onChangeStartDate={onChangeStartDate}
+            onChangeEndDate={onChangeEndDate}
+            setCars={setCars}
+            setIsSubmitted={setIsSubmitted}
+          />
+          <div className='mainPage'>
+            <div className='filter'>
+              {Filter && (
+                <Filter
+                  setSelectedBrand={setSelectedBrand}
+                  setSelectedSort={setSelectedSort}
+                  setSelectedTransmission={setSelectedTransmission}
+                />
+              )}
+            </div>
+            <div className='carList'>
+              {cars.length === 0 && isSubmitted===true? (
+                errorMsg({ msg: "Such cars no"})
+              ) : (
+                cars.map((car) => {
+                  const { uniqueCars, nonUniqueCars } = getUniqueAndNonUnique(cars)
+                  const isUniqueCar = uniqueCars.some((uniqueCar) => {
+                    const uniqueCarKey = `${uniqueCar.Brand}_${uniqueCar.Model}_${uniqueCar.Seats}_${uniqueCar.Transmission}_${uniqueCar.OneHourPrice}_${uniqueCar.TwoHoursPrice}_${uniqueCar.FiveHoursPrice}_${uniqueCar.OneDayPrice}`
+                    const carKey = `${car.Brand}_${car.Model}_${car.Seats}_${car.Transmission}_${car.OneHourPrice}_${car.TwoHoursPrice}_${car.FiveHoursPrice}_${car.OneDayPrice}`
+                    return uniqueCarKey === carKey;
+                  })
+
+                  return (
+                    <section className="car" key={car.ID}>
+                      <div className="column">
+                        <Img image={car.Image}/>
+                      </div>
+                        <div className="column">
+                          <Name
+                            brand={car.Brand}
+                            model={car.Model}
+                          />
+                          <FurtherInfo
+                            seats={car.Seats}
+                            transmission={car.Transmission}
+                            isLastCar={isUniqueCar}
+                          />
+                        </div>
+                        <div className="column">
+                          <Price
+                            onehourprice={car.OneHourPrice}
+                            twohoursprice={car.TwoHoursPrice}
+                            fivehoursprice={car.FiveHoursPrice}
+                            onedayprice={car.OneDayPrice}
+                        />
+                        <span className='reservationButton'>
+                          <Buttons
+                            site={`/reservation/${car.ID}`}
+                            title={"Reservation"}
+                          />
+                        </span>
+                        </div>
+                      </section>
+                    )
+                })
+              )}
+          </div>
+            {/* <div className='carList'>
+                {cars.map((car) => {
+                  const { uniqueCars, nonUniqueCars } = getUniqueAndNonUnique(cars)
+                  const isUniqueCar = uniqueCars.some((uniqueCar) => {
+                    const uniqueCarKey = `${uniqueCar.Brand}_${uniqueCar.Model}_${uniqueCar.Seats}_${uniqueCar.Transmission}_${uniqueCar.OneHourPrice}_${uniqueCar.TwoHoursPrice}_${uniqueCar.FiveHoursPrice}_${uniqueCar.OneDayPrice}`
+                    const carKey = `${car.Brand}_${car.Model}_${car.Seats}_${car.Transmission}_${car.OneHourPrice}_${car.TwoHoursPrice}_${car.FiveHoursPrice}_${car.OneDayPrice}`
+                    return uniqueCarKey === carKey;
+                  })
+
+                  return (
+                    <section className="car" key={car.ID}>
+                      <div className="column">
+                        <Img image={car.Image}/>
+                      </div>
+                        <div className="column">
+                          <Name
+                            brand={car.Brand}
+                            model={car.Model}
+                          />
+                          <FurtherInfo
+                            seats={car.Seats}
+                            transmission={car.Transmission}
+                            isLastCar={isUniqueCar}
+                          />
+                        </div>
+                        <div className="column">
+                          <Price
+                            onehourprice={car.OneHourPrice}
+                            twohoursprice={car.TwoHoursPrice}
+                            fivehoursprice={car.FiveHoursPrice}
+                            onedayprice={car.OneDayPrice}
+                        />
+                        <span className='reservationButton'>
+                          <Buttons
+                            site={`/reservation/${car.ID}`}
+                            title={"Reservation"}
+                          />
+                        </span>
+                        </div>
+                      </section>
+                    )
+                })}
+            </div> */}
+          </div>
+        </>
       }
-
-      <DatesPicker
-        startDate={startDate}
-        endDate={endDate}
-        onChangeStartDate={onChangeStartDate}
-        onChangeEndDate={onChangeEndDate}
-        setCars={setCars}
-        setIsSubmitted={setIsSubmitted}
-      />
-
-      {Filter && (
-        <Filter
-          setSelectedBrand={setSelectedBrand}
-          setSelectedSort={setSelectedSort}
-          setSelectedTransmission={setSelectedTransmission}
-        />
-      )}
-
-      {cars.map((car, index) => (
-          <section className="car" key={car.ID} style={{ margin: '3rem 0 0 0' }}>
-            <div className="img">
-              <Img
-                image={car.Image}
-              />
-            </div>
-            <div className="info">
-              <Name
-                brand={car.Brand}
-                model={car.Model}
-            />
-            <p>{getUnique(cars).lastUniqueCars[index] ? 'not last' : 'last'}</p>
-              <FurtherInfo
-                seats={car.Seats}
-                transmission={car.Transmission}
-                lastCar={getUnique(cars).lastUniqueCars[index]}
-                // lastCar={hasDuplicates(car)}
-            />
-            </div>
-            <div className="price">
-              <Price
-                onehourprice={car.OneHourPrice}
-                twohoursprice={car.TwoHoursPrice}
-                fivehoursprice={car.FiveHoursPrice}
-                onedayprice={car.OneDayPrice}
-              />
-            </div>
-            <div className="buttons">
-              {Current_user === "admin" ? 
-                <>
-                  <Buttons
-                    site={`/update/${car.ID}`}
-                    title={"Update"}
-                  />
-                  <button type='button' onClick={() => handleDelete(car.ID)} className='btn btn-danger btn-sm m-2 fs-5'>Delete</button>
-                </>
-              : 
-                <></>
-              }
-              <Buttons
-                site={`/reservation/${car.ID}`}
-                title={"Reservation"}
-              />
-            </div>
-          </section>
-        ))
-      }
-     </>
-   )
- }
+    </>
+  )
+}
 
 export default Cars

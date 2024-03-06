@@ -2,22 +2,29 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useState } from 'react'
 
 import Cars from './carList/Cars'
-import CreateCar from './carForm/CreateCar'
-import UpdateCar from './carForm/UpdateCar'
+import CreateCar from './adminPage/tables/carForm/CreateCar'
+import UpdateCar from './adminPage/tables/carForm/UpdateCar'
 import Nav from './components/navigation/Nav'
-import Reservation from './carList/components/reservation'
+import Reservation from './carList/components/reservation/reservation'
 import Login from './login/Login'
+import CarTable from './adminPage/tables/carTable'
+import ReservationTable from './adminPage/tables/reservationTable'
+import CreateReservation from './adminPage/tables/reservationForm/CreateReservation'
+import UpdateReservation from './adminPage/tables/reservationForm/UpdateReservation'
 
 const Users = {
-    Public: "public",
-    Admin: "admin"
-  }
+  Public: "public",
+  Admin: "admin"
+}
 
 export default function App() {
 
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [currentUser, setCurrentUser] = useState(Users.Public);
+
+  const storedUser = localStorage.getItem('currentUser')
+  const initialUser = storedUser ? storedUser : Users.Public
+  const [currentUser, setCurrentUser] = useState(initialUser)
 
   const handleStartDate = (startDate) => {
     setStartDate(startDate)
@@ -27,10 +34,15 @@ export default function App() {
     setEndDate(endDate)
   }
 
+  const setCurrentUserWithStorage = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('currentUser', user)
+  }
+
   return (
     <>
       <BrowserRouter>
-        <Nav Current_user={currentUser} />
+        <Nav Current_user={currentUser} setCurrentUser={setCurrentUserWithStorage}/>
         <Routes>
           <Route
             path='/'
@@ -42,8 +54,10 @@ export default function App() {
               Current_user={currentUser}
             />}
           />
-          <Route path='/create' element={<CreateCar Current_user={currentUser} />} />
-          <Route path='/update/:ID' element={<UpdateCar Current_user={currentUser}/>} />
+          <Route path='/createCar' element={<CreateCar Current_user={currentUser} />} />
+          <Route path='/updateCar/:ID' element={<UpdateCar Current_user={currentUser} />} />
+          <Route path='/createReservation' element={<CreateReservation Current_user={currentUser} />} />
+          <Route path='/updateReservation/:ID' element={<UpdateReservation Current_user={currentUser}/>} />
           <Route
             path='/reservation/:ID'
             element={<Reservation
@@ -52,6 +66,8 @@ export default function App() {
             />}
           />
           <Route path='/login' element={<Login setCurrentUser={setCurrentUser}/>}></Route>
+          <Route path='/carTable' element={<CarTable Current_user={currentUser} />}></Route>
+          <Route path='/reservationTable' element={<ReservationTable Current_user={currentUser} />}></Route>
         </Routes>
       </BrowserRouter>
     </>

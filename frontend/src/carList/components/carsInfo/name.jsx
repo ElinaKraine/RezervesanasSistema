@@ -1,5 +1,5 @@
-import { Typography } from 'antd';
-const { Title } = Typography;
+import { Typography } from 'antd'
+const { Title } = Typography
 
 export default function Name({ brand, model }) {
     return (

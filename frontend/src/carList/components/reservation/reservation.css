@@ -1,0 +1,81 @@
+.carReservation{
+    display: flex;
+    margin: 3rem 4rem;
+    border: 1px solid #000;
+    width: 50%;
+    border-radius: .5rem;
+    justify-content: space-around;
+}
+
+.infoReservation{
+    width: 20rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.carAndTime{
+    display: flex;
+    width: 100%;
+}
+
+.time{
+    display: flex;
+    width: 50%;
+    margin: auto;
+}
+
+:where(.css-dev-only-do-not-override-1drr2mu).ant-steps .ant-steps-item-container {
+    width: 20rem;
+}
+
+:where(.css-dev-only-do-not-override-1drr2mu).ant-steps .ant-steps-item-finish>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-description{
+    color: #000;
+    font-size: 2rem;
+    width: 15rem;
+}
+
+:where(.css-dev-only-do-not-override-1drr2mu).ant-steps .ant-steps-item-finish>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title{
+    font-size: 1.2rem;
+}
+
+.totalPrice{
+    width: 30%;
+    height: 15vh;
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin: 2rem 6rem 0 0 ;
+    align-content: flex-end;
+    flex-wrap: wrap;
+    align-items: end;
+    font-size: 1.5rem;
+}
+
+.row{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.totalTime, .priceForTotalTime{
+    margin-bottom: 1rem;
+}
+
+.priceForTotalTime{
+    font-weight: bold;
+}
+
+.btnReservation{
+    background: darkgreen;
+    color: white;
+    border: 1px solid darkgreen;
+    border-radius: .5rem;
+}
+
+.btnReservation:hover{
+    cursor: pointer;
+    background: green;
+}

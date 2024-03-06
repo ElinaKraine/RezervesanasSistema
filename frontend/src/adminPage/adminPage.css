@@ -1,0 +1,14 @@
+.adminPage{
+    width: 50%;
+    margin: auto;
+    padding-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.fs-5 {
+    font-size: 1.5rem !important;
+    width: 20rem;
+}
