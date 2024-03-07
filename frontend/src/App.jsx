@@ -8,9 +8,7 @@ import Nav from './components/navigation/Nav'
 import Reservation from './carList/components/reservation/reservation'
 import Login from './login/Login'
 import CarTable from './adminPage/tables/carTable'
-import ReservationTable from './adminPage/tables/reservationTable'
-import CreateReservation from './adminPage/tables/reservationForm/CreateReservation'
-import UpdateReservation from './adminPage/tables/reservationForm/UpdateReservation'
+import ReservationTable from './adminPage/tables/reservationsTable'
 
 const Users = {
   Public: "public",
@@ -56,8 +54,6 @@ export default function App() {
           />
           <Route path='/createCar' element={<CreateCar Current_user={currentUser} />} />
           <Route path='/updateCar/:ID' element={<UpdateCar Current_user={currentUser} />} />
-          <Route path='/createReservation' element={<CreateReservation Current_user={currentUser} />} />
-          <Route path='/updateReservation/:ID' element={<UpdateReservation Current_user={currentUser}/>} />
           <Route
             path='/reservation/:ID'
             element={<Reservation

@@ -1,4 +1,5 @@
-import { DatePicker, TimePicker } from 'antd'
+import { DatePicker, TimePicker, Typography } from 'antd'
+const { Title } = Typography
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import './datesPicker.css'
@@ -22,18 +23,21 @@ export default function DatesPicker({ startDate, endDate, onChangeStartDate, onC
 
         if (startDate == 'Invalid Date' && endDate == 'Invalid Date') {
             setCars([])
-            errorMsg({msg: 'Enter a dates'})
+            errorMsg({ msg: 'Enter a dates' })
         } else if (dayjs(startDate).isBefore(currentDateTime) || dayjs(endDate).isBefore(currentDateTime)) {
-            errorMsg({msg: 'Both start and end dates must be in the future'})
+            errorMsg({ msg: 'Both start and end dates must be in the future' })
             setCars([])
-        }else if (dayjs(startDate).isBefore(currentDateTime.add(1, 'hour'))) {
-            errorMsg({msg: 'Start time must be at least 1 hour from the current time'})
+        } else if (dayjs(startDate).isBefore(currentDateTime.add(1, 'hour'))) {
+            errorMsg({ msg: 'Start time must be at least 1 hour from the current time' })
             setCars([]);
         } else if (dayjs(endDate).isBefore(dayjs(startDate))) {
-            errorMsg({msg: 'Start date must be before or equal to end date'})
+            errorMsg({ msg: 'Start date must be before or equal to end date' })
             setCars([])
         } else if (dayjs(endDate).diff(dayjs(startDate)) < minTimeDifference) {
-            errorMsg({msg: 'The difference between start and end date must be at least 1 hour'})
+            errorMsg({ msg: 'The difference between start and end date must be at least 1 hour' })
+            setCars([])
+        } else if (dayjs(startDate).minute() !== 0 || dayjs(endDate).minute() !== 0) {
+            errorMsg({ msg: 'Minutes must be 00' })
             setCars([])
         } else {
             onChangeStartDate(startDate)
@@ -46,7 +50,9 @@ export default function DatesPicker({ startDate, endDate, onChangeStartDate, onC
         <>
             <form onSubmit={handleSubmit} className='datesForm'>
                 <div className='column'>
-                    <label htmlFor="startDate">Pick-up date</label>
+                    <Title level={2}>Pick-up date</Title>
+                </div>
+                <div className='column'>
                     <DatePicker
                         name='startD'
                         format="YYYY-MM-DD"
@@ -64,7 +70,9 @@ export default function DatesPicker({ startDate, endDate, onChangeStartDate, onC
                     />
                 </div>
                 <div className='column'>
-                    <label htmlFor="endDate">Drop-off date</label>
+                    <Title level={2}>Drop-off date</Title>
+                </div>
+                <div className='column'>
                     <DatePicker
                         name='endD'
                         format="YYYY-MM-DD"

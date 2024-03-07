@@ -77,8 +77,8 @@ const CarTable = ({ Current_user }) => {
               value: 'Toyota',
           },
           {
-              text: 'Smart',
-              value: 'Smart',
+              text: 'Smarts',
+              value: 'Smarts',
           },
           {
               text: 'Kia',

@@ -11,7 +11,6 @@ import DatesPicker from './components/datesPicker/datesPicker'
 import Filter from './components/filter/Filter'
 import AdminPage from '../adminPage/adminPage'
 import './components/cars.css'
-import errorMsg from '../components/message/errorMsg'
 
 const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_user }) => {
 
@@ -20,6 +19,7 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
   const [selectedBrand, setSelectedBrand] = useState([])
   const [selectedSort, setSelectedSort] = useState(null)
   const [selectedTransmission, setSelectedTransmission] = useState([])
+  const [showNoCarsMessage, setShowNoCarsMessage] = useState(false);
 
   useEffect(() => {
     if (isSubmitted) {
@@ -43,6 +43,7 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
           }
 
           const response = await axios.get(apiUrl)
+          console.log(apiUrl)
 
           if (response.data && response.data.Error) {
             console.error(response.data.Error)
@@ -56,11 +57,13 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
         } catch (error) {
           console.error('Error fetching cars. Please try again.', error)
           setCars([])
+        } finally {
+          setIsSubmitted(false)
+          setShowNoCarsMessage(true)
         }
       }
-
+  
       fetchData()
-      setIsSubmitted(false)
     }
   }, [startDate, endDate, selectedBrand, selectedSort, isSubmitted])
 
@@ -116,95 +119,52 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
               )}
             </div>
             <div className='carList'>
-              {cars.length === 0 && isSubmitted===true? (
-                errorMsg({ msg: "Such cars no"})
-              ) : (
-                cars.map((car) => {
-                  const { uniqueCars, nonUniqueCars } = getUniqueAndNonUnique(cars)
-                  const isUniqueCar = uniqueCars.some((uniqueCar) => {
-                    const uniqueCarKey = `${uniqueCar.Brand}_${uniqueCar.Model}_${uniqueCar.Seats}_${uniqueCar.Transmission}_${uniqueCar.OneHourPrice}_${uniqueCar.TwoHoursPrice}_${uniqueCar.FiveHoursPrice}_${uniqueCar.OneDayPrice}`
-                    const carKey = `${car.Brand}_${car.Model}_${car.Seats}_${car.Transmission}_${car.OneHourPrice}_${car.TwoHoursPrice}_${car.FiveHoursPrice}_${car.OneDayPrice}`
-                    return uniqueCarKey === carKey;
+            {(showNoCarsMessage && cars.length <= 0) ? (
+                  <h1 style={{marginLeft:'2rem', color:'darkred'}}>No cars</h1>
+                ) : (
+                  cars.map((car) => {
+                    const { uniqueCars, nonUniqueCars } = getUniqueAndNonUnique(cars)
+                    const isUniqueCar = uniqueCars.some((uniqueCar) => {
+                      const uniqueCarKey = `${uniqueCar.Brand}_${uniqueCar.Model}_${uniqueCar.Seats}_${uniqueCar.Transmission}_${uniqueCar.OneHourPrice}_${uniqueCar.TwoHoursPrice}_${uniqueCar.FiveHoursPrice}_${uniqueCar.OneDayPrice}`
+                      const carKey = `${car.Brand}_${car.Model}_${car.Seats}_${car.Transmission}_${car.OneHourPrice}_${car.TwoHoursPrice}_${car.FiveHoursPrice}_${car.OneDayPrice}`
+                      return uniqueCarKey === carKey;
+                    })
+  
+                    return (
+                      <section className="car" key={car.ID}>
+                        <div className="column">
+                          <Img image={car.Image}/>
+                        </div>
+                          <div className="column">
+                            <Name
+                              brand={car.Brand}
+                              model={car.Model}
+                            />
+                            <FurtherInfo
+                              seats={car.Seats}
+                              transmission={car.Transmission}
+                              isLastCar={isUniqueCar}
+                            />
+                          </div>
+                          <div className="column">
+                            <Price
+                              onehourprice={car.OneHourPrice}
+                              twohoursprice={car.TwoHoursPrice}
+                              fivehoursprice={car.FiveHoursPrice}
+                              onedayprice={car.OneDayPrice}
+                          />
+                          <span className='reservationButton'>
+                            <Buttons
+                              site={`/reservation/${car.ID}`}
+                              title={"Reservation"}
+                            />
+                          </span>
+                          </div>
+                        </section>
+                      )
                   })
-
-                  return (
-                    <section className="car" key={car.ID}>
-                      <div className="column">
-                        <Img image={car.Image}/>
-                      </div>
-                        <div className="column">
-                          <Name
-                            brand={car.Brand}
-                            model={car.Model}
-                          />
-                          <FurtherInfo
-                            seats={car.Seats}
-                            transmission={car.Transmission}
-                            isLastCar={isUniqueCar}
-                          />
-                        </div>
-                        <div className="column">
-                          <Price
-                            onehourprice={car.OneHourPrice}
-                            twohoursprice={car.TwoHoursPrice}
-                            fivehoursprice={car.FiveHoursPrice}
-                            onedayprice={car.OneDayPrice}
-                        />
-                        <span className='reservationButton'>
-                          <Buttons
-                            site={`/reservation/${car.ID}`}
-                            title={"Reservation"}
-                          />
-                        </span>
-                        </div>
-                      </section>
-                    )
-                })
-              )}
-          </div>
-            {/* <div className='carList'>
-                {cars.map((car) => {
-                  const { uniqueCars, nonUniqueCars } = getUniqueAndNonUnique(cars)
-                  const isUniqueCar = uniqueCars.some((uniqueCar) => {
-                    const uniqueCarKey = `${uniqueCar.Brand}_${uniqueCar.Model}_${uniqueCar.Seats}_${uniqueCar.Transmission}_${uniqueCar.OneHourPrice}_${uniqueCar.TwoHoursPrice}_${uniqueCar.FiveHoursPrice}_${uniqueCar.OneDayPrice}`
-                    const carKey = `${car.Brand}_${car.Model}_${car.Seats}_${car.Transmission}_${car.OneHourPrice}_${car.TwoHoursPrice}_${car.FiveHoursPrice}_${car.OneDayPrice}`
-                    return uniqueCarKey === carKey;
-                  })
-
-                  return (
-                    <section className="car" key={car.ID}>
-                      <div className="column">
-                        <Img image={car.Image}/>
-                      </div>
-                        <div className="column">
-                          <Name
-                            brand={car.Brand}
-                            model={car.Model}
-                          />
-                          <FurtherInfo
-                            seats={car.Seats}
-                            transmission={car.Transmission}
-                            isLastCar={isUniqueCar}
-                          />
-                        </div>
-                        <div className="column">
-                          <Price
-                            onehourprice={car.OneHourPrice}
-                            twohoursprice={car.TwoHoursPrice}
-                            fivehoursprice={car.FiveHoursPrice}
-                            onedayprice={car.OneDayPrice}
-                        />
-                        <span className='reservationButton'>
-                          <Buttons
-                            site={`/reservation/${car.ID}`}
-                            title={"Reservation"}
-                          />
-                        </span>
-                        </div>
-                      </section>
-                    )
-                })}
-            </div> */}
+                )}
+            </div>
           </div>
         </>
       }

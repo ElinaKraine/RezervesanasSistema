@@ -1,8 +1,9 @@
 import '../filter/filter.css'
-import { Select, Radio, Checkbox } from 'antd'
+import { Select, Radio, Checkbox, Typography } from 'antd'
+const { Title } = Typography
 import { useState } from 'react'
 
-const optionsBrand = ['VW', 'Fiat', 'Renault', 'Skoda', 'Toyota', 'Smart', 'Kia', 'Ford', 'Audi', 'Opel', 'Nissan', 'Lincoln']
+const optionsBrand = ['VW', 'Fiat', 'Renault', 'Skoda', 'Toyota', 'Smarts', 'Kia', 'Ford', 'Audi', 'Opel', 'Nissan', 'Lincoln']
 const optionsTransmission = [
   {
     label: 'Manual',
@@ -38,9 +39,20 @@ const Filter = ({ setSelectedBrand, setSelectedSort, setSelectedTransmission }) 
     setTransmission(value)
   }
 
+  const clearFilters = () => {
+    setSelectedBrand([])
+    setSelectedSort(null)
+    setSelectedTransmission([])
+    setBrand([])
+    setSort(null)
+    setTransmission([])
+  }
+
   return (
     <div className='carFilter'>
+      <Title level={2}>Filters</Title>
       <Select
+        size='large'
         mode="multiple"
         showSearch
         placeholder="Select a Brand"
@@ -64,6 +76,7 @@ const Filter = ({ setSelectedBrand, setSelectedSort, setSelectedTransmission }) 
         onChange={onChangeTransmission}
         value={transmission}
       />
+      <button onClick={clearFilters} className='clearFilters'>Clear Filters</button>
     </div>
   )
 }

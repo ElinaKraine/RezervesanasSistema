@@ -4,7 +4,7 @@ export default function Img({ image }) {
     return (
         <Image
             width={350}
-            src={image}
+            src='{image}'
         />
     )
 }

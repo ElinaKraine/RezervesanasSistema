@@ -1,4 +1,4 @@
-.datesForm{
+.datesForm {
     border-radius: 0.5rem;
     background: #c9c9c9;
     margin: auto;
@@ -13,11 +13,11 @@
     flex-wrap: wrap;
 }
 
-.datesForm label{
-    margin: 0 1rem;
+.datesForm h2 {
+    margin: 1rem;
 }
 
-.datesForm button{
+.datesForm button {
     font-size: 1.3rem;
     cursor: pointer;
     margin-left: 1rem;
@@ -29,23 +29,29 @@
     color: #fff;
 }
 
-.datesForm button:hover{
+.datesForm button:hover {
     background: #fff;
     color: #000;
-    border-color: #fff;
 }
 
-.datepicker, .timepicker{
+.datepicker,
+.timepicker {
     width: 12rem;
     height: 3rem;
     margin-right: .5rem;
 }
 
-.timepicker{
+.timepicker {
     width: 9rem;
 }
 
-.ant-picker-input input, .ant-picker-dropdown, .ant-time-picker-panel-input, .ant-picker-clear, .ant-picker-input input,
-.ant-picker-input>input, .ant-picker-focused .ant-picker-input>input, .ant-picker .ant-picker-input>input {
+.ant-picker-input input,
+.ant-picker-dropdown,
+.ant-time-picker-panel-input,
+.ant-picker-clear,
+.ant-picker-input input,
+.ant-picker-input>input,
+.ant-picker-focused .ant-picker-input>input,
+.ant-picker .ant-picker-input>input {
     font-size: 1.1rem;
 }

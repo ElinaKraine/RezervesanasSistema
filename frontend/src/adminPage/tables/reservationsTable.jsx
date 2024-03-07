@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
-import { Link } from 'react-router-dom'
-import { Table, Space } from 'antd'
+import { Table } from 'antd'
 import dayjs from 'dayjs'
 
 import successMsg from '../../components/message/successMsg'
@@ -69,27 +68,12 @@ const ReservationTable = ({ Current_user }) => {
             dataIndex: 'Price',
             key: 'Price',
             sorter: (a, b) => a.Price - b.Price,
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (record) => (
-            <Space size="middle">
-                <Link to={`/updateReservation/${record.ID_R}`} className="btnUpdate" key={'updateReservation'}>
-                Update
-                </Link>
-                <button className="btnDelete" type="button" onClick={() => handleDelete(record.ID_R)} key={'deleteReservation'}>
-                Delete
-                </button>
-            </Space>
-            ),
-        },
+        }
         ]
 
     return(
         Current_user === "admin" ?
         <div className="table">
-            <Link to="/createReservation" className='btnCreate'>Add Reservation</Link>
             <Table columns={columns} dataSource={tableData} />
         </div>
         :

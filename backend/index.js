@@ -30,9 +30,16 @@ app.get("/", async (req, res) => {
             WHERE ID NOT IN (
                 SELECT ID_Car
                 FROM kraine.Reservation
-                WHERE (PickUpDate <= ? AND DropOffDate >= ?)
-                OR (PickUpDate <= ? AND DropOffDate >= ?)
-                OR (PickUpDate >= ? AND DropOffDate <= ?)
+                WHERE 
+                    (PickUpDate <= ? AND DropOffDate >= ?)
+                    OR (PickUpDate <= ? AND DropOffDate >= ?)
+                    OR (PickUpDate >= ? AND DropOffDate <= ?)
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM kraine.Reservation
+                WHERE kraine.Reservation.ID_Car = kraine.Cars.ID
+                AND DropOffDate <= TIMESTAMPADD(MINUTE, -10, NOW())
             )
         `;
 
@@ -69,7 +76,6 @@ app.get("/", async (req, res) => {
             }
         })
     }
-
 })
 
 app.get("/carTable", (req, res) => {
@@ -115,25 +121,6 @@ app.post("/createCar", (req, res) => {
     })
 })
 
-app.post("/createReservation", (req, res) => {
-    const sql = "INSERT INTO kraine.Reservation (ID_Car, PickUpDate, DropOffDate, Price) VALUES (?)";
-    
-    const values = [
-        req.body.ID_Car,
-        req.body.PickUpDate,
-        req.body.DropOffDate,
-        req.body.Price
-    ]
-
-    db.query(sql, [values], (err, data) => {
-        if (err) {
-            console.error('Error creating reservations:', err)
-            return res.status(500).json({ Error: "Error creating reservations" })
-        }
-        return res.json(data);
-    })
-})
-
 app.put("/updateCar/:ID", (req, res) => {
     const sql = "UPDATE kraine.Cars SET Brand = ?, Model = ?, Seats = ?, Transmission = ?,  OneHourPrice = ?, TwoHoursPrice = ?, FiveHoursPrice = ?, OneDayPrice = ?, Image = ?  WHERE ID = ?";
     
@@ -153,25 +140,6 @@ app.put("/updateCar/:ID", (req, res) => {
         if (err) {
             console.error('Error updating car:', err)
             return res.status(500).json({ Error: "Error updating car" })
-        }
-        return res.json(data)
-    })
-})
-
-app.put("/updateReservation/:ID", (req, res) => {
-    const sql = "UPDATE kraine.Reservation SET ID_Car = ?, PickUpDate = ?, DropOffDate = ?, Price = ?  WHERE ID_R = ?";
-    
-    const values = [
-        req.body.ID_Car,
-        req.body.PickUpDate,
-        req.body.DropOffDate,
-        req.body.Price
-    ]
-    const id = req.params.ID;
-    db.query(sql, [...values, id] , (err, data) => {
-        if (err) {
-            console.error('Error updating reservations:', err)
-            return res.status(500).json({ Error: "Error updating reservations" })
         }
         return res.json(data)
     })
@@ -199,33 +167,9 @@ app.delete("/deleteCar/:ID", (req, res) => {
     })
 })
 
-app.delete("/deleteReservation/:ID_R", (req, res) => {
-    const id = req.params.ID_R
-    const sql = "DELETE FROM kraine.Reservation WHERE ID_R = ?"
-    db.query(sql, [id], (err, data) => {
-        if (err) {
-            console.error('Error deleting reservations:', err)
-            return res.status(500).json({ Error: "Error deleting reservations" })
-        }
-        return res.json(data)
-    })
-})
-
 app.get('/getrecordCar/:ID', (req, res) => {
     const id = req.params.ID
     const sql = "SELECT * FROM kraine.Cars WHERE ID = ?"
-    db.query(sql, [id], (err, data) => {
-        if (err) {
-            return res.json({ Error: "Error" })
-        } else {
-            return res.json(data)
-        }
-    })
-})
-
-app.get('/getrecordReservation/:ID', (req, res) => {
-    const id = req.params.ID
-    const sql = "SELECT * FROM kraine.Reservation WHERE ID_R = ?"
     db.query(sql, [id], (err, data) => {
         if (err) {
             return res.json({ Error: "Error" })

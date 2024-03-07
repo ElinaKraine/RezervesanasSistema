@@ -38,7 +38,6 @@ const UpdateCar = ({ Current_user }) => {
             })
     }
 
-
     useEffect(() => {
         axios
             .get(`http://localhost:3030/getrecordCar/${ID}`)
