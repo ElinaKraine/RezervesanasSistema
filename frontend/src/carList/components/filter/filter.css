@@ -20,21 +20,19 @@
 /*Select*/
 :where(.css-dev-only-do-not-override-1drr2mu).ant-select-multiple .ant-select-selection-overflow{
     font-size: 1.2rem;
-}/*
-:where(.css-dev-only-do-not-override-1drr2mu).ant-select-multiple{
-    font-size: 1.1rem;
-    width: 80%;
-    margin-bottom: 1rem;
-} */
+}
 .carFilter .ant-select {
     width: 15rem;
     margin-bottom: 1rem;
     max-height: max-content;
 }
-
-/* .carFilter .ant-select-selector {
-    height: 10rem;
-} */
+:where(.css-dev-only-do-not-override-1drr2mu).ant-select-multiple.ant-select-lg.ant-select-show-arrow .ant-select-selector,
+:where(.css-dev-only-do-not-override-1drr2mu).ant-select-multiple.ant-select-lg.ant-select-allow-clear .ant-select-selector{
+    height: auto;
+}
+:where(.css-dev-only-do-not-override-1drr2mu).ant-select-dropdown .ant-select-item-option{
+    font-size: 1.3rem;
+}
 
 .carFilter {
     border: 1px solid #c9c9c9;

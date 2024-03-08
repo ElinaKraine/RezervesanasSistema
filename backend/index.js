@@ -24,6 +24,10 @@ app.get("/", async (req, res) => {
     if (!startDate || !endDate) {
         return res.json({ Error: "Invalid date format" })
     } else {
+        // Automašīnu filtrēšana no tabulas Cars, izslēdzot automašīnas, 
+        // kas jau ir rezervētas laika intervālā.
+        // neiekļauj tos automašīnas, kuri ir rezervēti un kuru nodošana 
+        // notikusi pirms mazāk nekā 10 minūtēm.
         let sql = `
             SELECT * 
             FROM kraine.Cars

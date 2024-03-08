@@ -9,12 +9,12 @@ export default function Login({ setCurrentUser }) {
 
     const [name, setName] = useState('')
     const [password, setPassword] = useState('')
-    const [infoMessage, setInfoMessage] = useState('');
+    const [infoMessage, setInfoMessage] = useState('')
 
     const navigate = useNavigate()
 
     function handleSubmit(event) {
-        event.preventDefault();
+        event.preventDefault()
         axios
             .post('http://localhost:3030/login', { name, password })
             .then(res => {

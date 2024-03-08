@@ -42,10 +42,10 @@ const Reservation = ({startDate, endDate}) => {
           FiveHoursPrice: res.data[0].FiveHoursPrice,
           OneDayPrice: res.data[0].OneDayPrice,
           Image: res.data[0].Image,
-        });
+        })
       })
       .catch((err) => console.log(err))
-  }, [ID])
+  }, [ID, valuesCar])
 
   const formattedStartDate = dayjs(startDate).format('YYYY-MM-DD HH:mm:ss')
   const formattedEndDate = dayjs(endDate).format('YYYY-MM-DD HH:mm:ss')
@@ -116,7 +116,8 @@ const Reservation = ({startDate, endDate}) => {
       })
       .catch((err) => {
         console.log(err)
-        errorMsg({ msg: 'Reservation is not successful!'})
+        errorMsg({ msg: 'Reservation is not successful!' })
+        navigate('/')
        })
   }
 

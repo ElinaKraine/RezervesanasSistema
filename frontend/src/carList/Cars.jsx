@@ -19,8 +19,11 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
   const [selectedBrand, setSelectedBrand] = useState([])
   const [selectedSort, setSelectedSort] = useState(null)
   const [selectedTransmission, setSelectedTransmission] = useState([])
-  const [showNoCarsMessage, setShowNoCarsMessage] = useState(false);
+  const [showNoCarsMessage, setShowNoCarsMessage] = useState(false)
 
+  //Šis koda bloks ir atbildīgs par datu pieprasījuma veikšanu no servera, 
+  //kad mainās noteikti parametri, un servera atbildes apstrādi atkarībā no 
+  //tās satura
   useEffect(() => {
     if (isSubmitted) {
       const fetchData = async () => {
@@ -54,6 +57,7 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
             console.error('Invalid server response. Expected an array.')
             setCars([])
           }
+
         } catch (error) {
           console.error('Error fetching cars. Please try again.', error)
           setCars([])
@@ -68,26 +72,39 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
   }, [startDate, endDate, selectedBrand, selectedSort, isSubmitted])
 
   const getUniqueAndNonUnique = (cars) => {
+    //Unikālo atslēgu (uniqueKeys) un unikālo automobiļu (uniqueCars) un 
+    //unikālo automobiļu (nonUniqueCars) masīvu izveide
     const uniqueKeys = new Set()
     const uniqueCars = []
     const nonUniqueCars = []
   
+    //Katram automašīnas objektam no cars masīva
     cars.forEach((car) => {
+      //tiek izveidots jauns carWithoutID objekts, izņemot īpašību ID
       const { ID, ...carWithoutID } = car
+      //unikāla atslēga, pamatojoties uz noteiktām mašīnas īpašībām
       const carKey = `${carWithoutID.Brand}_${carWithoutID.Model}_${carWithoutID.Seats}_${carWithoutID.Transmission}_${carWithoutID.OneHourPrice}_${carWithoutID.TwoHoursPrice}_${carWithoutID.FiveHoursPrice}_${carWithoutID.OneDayPrice}`
   
+      //Mašīnas unikalitātes pārbaude:
+
+      //pašreizējo mašīnu uzskata par unikālu, ja tās atslēga (atvasināta no noteiktām īpašībām) 
+      //nav sastopama iepriekš apstrādātajās mašīnās
       if (!uniqueKeys.has(carKey)) {
         uniqueKeys.add(carKey)
         uniqueCars.push(carWithoutID)
+      //Ja atslēga jau ir sastapta, uzskata, ka pašreizējā mašīna nav unikāla
       } else {
+        //Mēģinām atrast atbilstošās unikālās mašīnas indeksu unikālo mašīnu sarakstā
         const indexInUnique = uniqueCars.findIndex((uniqueCar) => {
           const uniqueCarKey = `${uniqueCar.Brand}_${uniqueCar.Model}_${uniqueCar.Seats}_${uniqueCar.Transmission}_${uniqueCar.OneHourPrice}_${uniqueCar.TwoHoursPrice}_${uniqueCar.FiveHoursPrice}_${uniqueCar.OneDayPrice}`
           return uniqueCarKey === carKey;
         })
-  
+
+        //Ja tādu atrodam, noņemam unikālo mašīnu no saraksta
         if (indexInUnique !== -1) {
           uniqueCars.splice(indexInUnique, 1)
         }
+
         nonUniqueCars.push(carWithoutID)
       }
     })
@@ -123,11 +140,14 @@ const Cars = ({ startDate, endDate, onChangeStartDate, onChangeEndDate, Current_
                   <h1 style={{marginLeft:'2rem', color:'darkred'}}>No cars</h1>
                 ) : (
                   cars.map((car) => {
+                    //Izsaukt getUniqueAndNonUnique(cars)
                     const { uniqueCars, nonUniqueCars } = getUniqueAndNonUnique(cars)
+                    //Ar metodi some tiek pārbaudīts, vai pašreizējais automobilis ir unikāls
                     const isUniqueCar = uniqueCars.some((uniqueCar) => {
+                      //Tas tiek darīts, veicot pašreizējās mašīnas īpašību salīdzināšanu ar mašīnu īpašībām no uniqueCars masīva
                       const uniqueCarKey = `${uniqueCar.Brand}_${uniqueCar.Model}_${uniqueCar.Seats}_${uniqueCar.Transmission}_${uniqueCar.OneHourPrice}_${uniqueCar.TwoHoursPrice}_${uniqueCar.FiveHoursPrice}_${uniqueCar.OneDayPrice}`
                       const carKey = `${car.Brand}_${car.Model}_${car.Seats}_${car.Transmission}_${car.OneHourPrice}_${car.TwoHoursPrice}_${car.FiveHoursPrice}_${car.OneDayPrice}`
-                      return uniqueCarKey === carKey;
+                      return uniqueCarKey === carKey
                     })
   
                     return (

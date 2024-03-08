@@ -2,9 +2,6 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { Table } from 'antd'
 import dayjs from 'dayjs'
-
-import successMsg from '../../components/message/successMsg'
-import errorMsg from '../../components/message/errorMsg'
 import './tables.css'
 
 const ReservationTable = ({ Current_user }) => {
@@ -15,19 +12,6 @@ const ReservationTable = ({ Current_user }) => {
         .then(res => setReservations(res.data))
         .catch(err => console.log(err))
     }, [])
-
-    const handleDelete = (ID) => {
-        axios.delete(`http://localhost:3030/deleteReservation/${ID}`)
-        .then((res) => {
-            console.log(res)
-            successMsg({ msg: 'The reservation is successfully deleted!' })
-            setReservations(reservations.filter(reservation => reservation.ID_R !== ID))
-        })
-        .catch((err) => {
-            errorMsg({ msg: 'The reservation is not successfully deleted!' })
-            console.log(err)
-        })
-    }
 
     const tableData = reservations.map((reservation, index) => ({
         key: index,

@@ -57,7 +57,10 @@ const UpdateCar = ({ Current_user }) => {
                 setformKey('asd')
             }
             )
-            .catch((err) => console.log(err))
+            .catch((err) => {
+                console.log(err),
+                navigate('/carTable')
+            })
     }, [])
 
     return (

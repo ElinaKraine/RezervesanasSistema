@@ -62,6 +62,7 @@ const Filter = ({ setSelectedBrand, setSelectedSort, setSelectedTransmission }) 
           value: item,
           label: item,
         }))}
+        className='selector'
       />
       <Radio.Group onChange={onChangeSort} value={sort}>
         <Radio value={'asc'}>
